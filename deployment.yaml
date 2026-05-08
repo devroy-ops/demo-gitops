@@ -1,11 +1,4 @@
-: apps/v1
-kind: Deployment
-metadata:
-  name: demo-app
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
+apiVersion: apps/v1apiVersion: apps:
       app: demo-app
   template:
     metadata:
@@ -17,6 +10,7 @@ spec:
         image: nginx
         ports:
         - containerPort: 80
+
 ---
 apiVersion: v1
 kind: Service
@@ -30,3 +24,10 @@ spec:
   - port: 80
     targetPort: 80
     nodePort: 30090
+``
+kind: Deployment
+metadata:
+  name: demo-app
+spec:
+  replicas: 2
+  selector:
