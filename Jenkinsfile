@@ -1,4 +1,4 @@
-pipeline {
+{
     agent any
 
     environment {
@@ -23,28 +23,28 @@ pipeline {
 
         stage('Build Image') {
             steps {
-                sh 'docker build -t $IMAGE .'
+                sh "docker build -t ${IMAGE} ."
             }
         }
 
         stage('Push Image') {
             steps {
-                sh 'docker push $IMAGE'
+                sh "docker push ${IMAGE}"
             }
         }
 
         stage('Update deployment.yaml') {
             steps {
-                sh '''
-                sed -i "s|image: .*|image: $IMAGE|" deployment.yaml
+                sh """
+                sed -i 's|image: .*|image: ${IMAGE}|' deployment.yaml
 
                 git config user.email "devops@example.com"
                 git config user.name "jenkins"
 
                 git add deployment.yaml
-                git commit -m "Update image to $IMAGE"
+                git commit -m "Update image to ${IMAGE}" || true
                 git push --set-upstream origin master
-                
+                """
             }
         }
 
