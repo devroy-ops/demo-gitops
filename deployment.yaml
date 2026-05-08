@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: demo-app
-        image: devroy/demo-app:242
+        image: devroy/demo-app:243
         ports:
         - containerPort: 80
 ---
