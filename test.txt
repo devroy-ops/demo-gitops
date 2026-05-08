@@ -3,3 +3,4 @@ trigger2
 final
 trigger again
 trigger again
+final automation proof
