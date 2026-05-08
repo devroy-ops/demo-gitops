@@ -43,8 +43,8 @@ pipeline {
 
                 git add deployment.yaml
                 git commit -m "Update image to $IMAGE"
-                git push
-                '''
+                git push --set-upstream origin master
+                
             }
         }
 
