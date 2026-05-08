@@ -1,4 +1,5 @@
-pipeline { any
+pipeline {
+    agent any
 
     environment {
         IMAGE = "devroy/demo-app:${BUILD_NUMBER}"
@@ -60,4 +61,3 @@ pipeline { any
 
     }
 }
-
