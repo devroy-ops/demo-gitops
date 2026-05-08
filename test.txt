@@ -8,3 +8,4 @@ auto-trigger-test
 auto-trigger-test1
 auto-test1
 full-cicd-test
+full-cicd-test
