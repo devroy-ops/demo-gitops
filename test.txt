@@ -7,3 +7,4 @@ final automation proof
 auto-trigger-test
 auto-trigger-test1
 auto-test1
+full-cicd-test
