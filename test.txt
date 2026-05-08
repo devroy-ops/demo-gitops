@@ -9,3 +9,4 @@ auto-trigger-test1
 auto-test1
 full-cicd-test
 full-cicd-test
+fix-dockerfile
