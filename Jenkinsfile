@@ -1,11 +1,11 @@
-pipeline {pipeline    agent any
+pipeline {
+    agent any
 
     stages {
         stage('Webhook Test') {
             steps {
-                sh 'echo "✅ Jenkins triggered automatically from GitHub push"'
+                sh 'echo "Jenkins triggered automatically from GitHub webhook ✅"'
             }
         }
     }
 }
-``
