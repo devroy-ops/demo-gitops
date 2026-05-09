@@ -43,7 +43,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: nginx
+        image: emailservice
         ports:
         - containerPort: 8080
         env:

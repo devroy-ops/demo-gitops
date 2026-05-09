@@ -43,7 +43,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: nginx
+        image: currencyservice
         ports:
         - name: grpc
           containerPort: 7000

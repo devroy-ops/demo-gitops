@@ -64,7 +64,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: nginx
+        image: busybox:latest
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"
@@ -77,7 +77,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: nginx
+        image: loadgenerator
         env:
         - name: FRONTEND_ADDR
           value: "frontend:80"

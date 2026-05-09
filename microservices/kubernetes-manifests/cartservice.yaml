@@ -43,7 +43,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: nginx
+        image: cartservice
         ports:
         - containerPort: 7070
         env:
@@ -115,7 +115,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: nginx
+        image: redis:alpine
         ports:
         - containerPort: 6379
         readinessProbe:
