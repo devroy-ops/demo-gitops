@@ -1,2 +1,1 @@
-FROM nginx
-COPY . /usr/share/nginx/html
+FROM gcr.io/google-samples/microservices-demo/frontend:v0.10.2
