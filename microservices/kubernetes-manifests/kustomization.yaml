@@ -35,8 +35,8 @@ images:
     newTag: v0.10.2
 
   - name: frontend
-    newName: docker.io/kencharos/google-samples-microservices-demo/frontend
-    newTag: v0.10.2
+    newName: devroy/frontend 
+    newTag: latest
 
   - name: paymentservice
     newName: docker.io/kencharos/google-samples-microservices-demo/paymentservice
