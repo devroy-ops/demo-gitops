@@ -1,18 +1,15 @@
-FROM golang:alpine
+FROM golang:1.23-alpine
 
 WORKDIR /app
 
 COPY frontend/ .
 
 RUN go mod tidy
- app .
+RUN go build -o app .
 
 EXPOSE 8080
 
 CMD ["./app"]
-
-
-
 
 
 
