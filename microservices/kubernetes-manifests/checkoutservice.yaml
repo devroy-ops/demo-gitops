@@ -42,7 +42,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: gcr.io/google-samples/microservices-demo/checkoutservice:v0.10.2
+          image: docker.io/kencharos/google-samples-microservices-demo/checkoutservice:v0.10.2
           ports:
           - containerPort: 5050
           readinessProbe:
