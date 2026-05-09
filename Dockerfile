@@ -1,1 +1,12 @@
-FROM docker.io/kencharos/google-samples-microservices-demo/frontend:v0.10.2
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY frontend/ .
+
+RUN npm install
+
+EXPOSE 8080
+
+CMD ["npm", "start"]
+
