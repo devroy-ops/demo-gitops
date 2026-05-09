@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine build -o frontend .
+FROM golang:alpine
 
 EXPOSE 8080
 
