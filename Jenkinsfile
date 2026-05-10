@@ -2,7 +2,6 @@ pipeline {
     agent any
 
     environment {
-        IMAGE = "devroy/frontend:latest"
         GIT_REPO = "https://github.com/devroy-ops/demo-gitops.git"
     }
 
@@ -28,21 +27,38 @@ pipeline {
             }
         }
 
-        stage('Build Image') {
+        // ✅ FRONTEND BUILD
+        stage('Build Frontend Image') {
             steps {
                 sh '''
-                        docker build --no-cache -t $IMAGE .
+                    docker build --no-cache -t devroy/frontend:latest .
                 '''
             }
         }
 
-        stage('Push Image') {
+        stage('Push Frontend Image') {
             steps {
                 sh '''
-                        docker push $IMAGE
+                    docker push devroy/frontend:latest
                 '''
             }
         }
 
+        // ✅ PRODUCT CATALOG BUILD
+        stage('Build ProductCatalog Image') {
+            steps {
+                sh '''
+                    docker build --no-cache -t devroy/productcatalogservice:latest -f Dockerfile-productcatalog .
+                '''
+            }
+        }
+
+        stage('Push ProductCatalog Image') {
+            steps {
+                sh '''
+                    docker push devroy/productcatalogservice:latest
+                '''
+            }
+        }
     }
 }
