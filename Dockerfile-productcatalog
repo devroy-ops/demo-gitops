@@ -1,0 +1,12 @@
+FROM golang:alpine
+
+WORKDIR /app
+
+COPY productcatalogservice/ .
+
+RUN go mod tidy
+RUN go build -o app .
+
+EXPOSE 3550
+
+CMD ["./app"]
