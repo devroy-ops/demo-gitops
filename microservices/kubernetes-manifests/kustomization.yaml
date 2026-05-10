@@ -12,7 +12,7 @@ images:
     newTag: v0.10.2
 
   - name: cartservice
-    newName: ddevroy/cartservice
+    newName: devroy/cartservice
     newTag: latest
 
   - name: checkoutservice
