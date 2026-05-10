@@ -5,14 +5,15 @@ resources:
   - currencyservice.yaml
   - frontend.yaml
   - productcatalogservice.yaml
+  - cartservice.yaml
 images:
   - name: adservice
     newName: docker.io/kencharos/google-samples-microservices-demo/adservice
     newTag: v0.10.2
 
   - name: cartservice
-    newName: docker.io/kencharos/google-samples-microservices-demo/cartservice
-    newTag: v0.10.2
+    newName: ddevroy/cartservice
+    newTag: latest
 
   - name: checkoutservice
     newName: docker.io/kencharos/google-samples-microservices-demo/checkoutservice

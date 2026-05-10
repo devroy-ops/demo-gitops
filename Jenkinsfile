@@ -7,12 +7,14 @@ pipeline {
 
     stages {
 
+        // ✅ CHECKOUT
         stage('Checkout Code') {
             steps {
                 git branch: 'master', url: "${GIT_REPO}"
             }
         }
 
+        // ✅ DOCKER LOGIN
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
@@ -27,7 +29,9 @@ pipeline {
             }
         }
 
+        // =========================================
         // ✅ FRONTEND
+        // =========================================
         stage('Build Frontend Image') {
             steps {
                 sh '''
@@ -44,7 +48,9 @@ pipeline {
             }
         }
 
+        // =========================================
         // ✅ PRODUCT CATALOG
+        // =========================================
         stage('Build ProductCatalog Image') {
             steps {
                 sh '''
@@ -61,7 +67,9 @@ pipeline {
             }
         }
 
-        // ✅ CURRENCY SERVICE (FIXED)
+        // =========================================
+        // ✅ CURRENCY SERVICE
+        // =========================================
         stage('Build CurrencyService Image') {
             steps {
                 sh '''
@@ -77,5 +85,25 @@ pipeline {
                 '''
             }
         }
+
+        // =========================================
+        // ✅ CART SERVICE
+        // =========================================
+        stage('Build CartService Image') {
+            steps {
+                sh '''
+                    docker build --no-cache -t devroy/cartservice:latest ./cartservice
+                '''
+            }
+        }
+
+        stage('Push CartService Image') {
+            steps {
+                sh '''
+                    docker push devroy/cartservice:latest
+                '''
+            }
+        }
+
     }
 }
