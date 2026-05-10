@@ -19,7 +19,7 @@ images:
     newTag: v0.10.2
 
   - name: currencyservice
-    newName: docker.io/kencharos/google-samples-microservices-demo/currencyservice
+    newName: gcr.io/google-samples/microservices-demo/currencyservice
     newTag: v0.10.2
 
   - name: emailservice
