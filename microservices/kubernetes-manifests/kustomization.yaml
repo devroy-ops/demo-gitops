@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - frontend.yaml
   - productcatalogservice.yaml
+  - currencyservice.yaml
 images:
   - name: adservice
     newName: docker.io/kencharos/google-samples-microservices-demo/adservice
