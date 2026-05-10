@@ -31,7 +31,7 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                        docker build -t $IMAGE .
+                        docker build --no-cache -t $IMAGE .
                 '''
             }
         }
