@@ -1,12 +1,13 @@
-FROM golang:alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY . .
+COPY package*.json ./
 
-RUN go mod tidy
-RUN go build -o app .
+RUN npm install --only=production
+
+COPY . .
 
 EXPOSE 7070
 
-CMD ["./app"]
+CMD ["node", "server.js"]
