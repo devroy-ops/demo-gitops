@@ -2,9 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - currencyservice.yaml
   - frontend.yaml
   - productcatalogservice.yaml
-  - currencyservice.yaml
 images:
   - name: adservice
     newName: docker.io/kencharos/google-samples-microservices-demo/adservice
@@ -19,8 +19,8 @@ images:
     newTag: v0.10.2
 
   - name: currencyservice
-    newName: docker.io/googlemicroservicesdemo/currencyservice
-    newTag: v0.10.2
+    newName: devroy/currencyservice
+    newTag: latest
 
   - name: emailservice
     newName: docker.io/kencharos/google-samples-microservices-demo/emailservice
