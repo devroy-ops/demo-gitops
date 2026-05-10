@@ -27,7 +27,7 @@ pipeline {
             }
         }
 
-        // ✅ FRONTEND BUILD
+        // ✅ FRONTEND
         stage('Build Frontend Image') {
             steps {
                 sh '''
@@ -44,7 +44,7 @@ pipeline {
             }
         }
 
-        // ✅ PRODUCT CATALOG BUILD
+        // ✅ PRODUCT CATALOG
         stage('Build ProductCatalog Image') {
             steps {
                 sh '''
@@ -57,6 +57,23 @@ pipeline {
             steps {
                 sh '''
                     docker push devroy/productcatalogservice:latest
+                '''
+            }
+        }
+
+        // ✅ CURRENCY SERVICE (FIXED)
+        stage('Build CurrencyService Image') {
+            steps {
+                sh '''
+                    docker build --no-cache -t devroy/currencyservice:latest -f Dockerfile-currency ./currencyservice
+                '''
+            }
+        }
+
+        stage('Push CurrencyService Image') {
+            steps {
+                sh '''
+                    docker push devroy/currencyservice:latest
                 '''
             }
         }
