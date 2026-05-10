@@ -65,7 +65,7 @@ pipeline {
         stage('Build CurrencyService Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t devroy/currencyservice:latest -f Dockerfile-currency ./currencyservice
+                    docker build --no-cache -t devroy/currencyservice:latest ./currencyservice
                 '''
             }
         }
