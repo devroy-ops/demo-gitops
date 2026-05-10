@@ -3,7 +3,7 @@ kind: Kustomization
 
 resources:
   - frontend.yaml
-
+  - productcatalogservice.yaml
 images:
   - name: adservice
     newName: docker.io/kencharos/google-samples-microservices-demo/adservice
@@ -34,8 +34,8 @@ images:
     newTag: v0.10.2
 
   - name: productcatalogservice
-    newName: docker.io/kencharos/google-samples-microservices-demo/productcatalogservice
-    newTag: v0.10.2
+    newName: devroy/productcatalogservice
+    newTag: latest
 
   - name: recommendationservice
     newName: docker.io/kencharos/google-samples-microservices-demo/recommendationservice
