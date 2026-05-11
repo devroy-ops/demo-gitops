@@ -32,6 +32,15 @@ spec:
         - name: REDIS_ADDR
           value: "redis-cart:6379"
 
+
+        # ✅ ADD THIS PART
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: redis-secret
+              key: REDIS_PASSWORD
+
+
         resources:
           requests:
             cpu: 200m
