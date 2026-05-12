@@ -35,7 +35,7 @@ pipeline {
         stage('Build Frontend Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t devroy/frontend:latest .
+                    docker build --no-cache -t devroy/frontend:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -43,7 +43,7 @@ pipeline {
         stage('Push Frontend Image') {
             steps {
                 sh '''
-                    docker push devroy/frontend:latest
+                    docker push devroy/frontend:${BUILD_NUMBER}
                 '''
             }
         }
