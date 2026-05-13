@@ -37,7 +37,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: server
-          image: devroy/frontend:470
+          image: devroy/frontend:471
           command: ["./app"]
           securityContext:
             allowPrivilegeEscalation: false
