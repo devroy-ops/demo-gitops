@@ -6,26 +6,12 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    # Docker login
-    - name: Login to DockerHub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-    # Build image
-    - name: Build Docker image
-      run: |
-        docker build -t devroy/frontend:${{ github.sha }} ./microservices/src/frontend
-
-    # Push image
-    - name: Push Docker image
-      run: |
-        docker push devroy/frontend:${{ github.sha }}
 
     # Setup kubeconfig
     - name: Set kubeconfig
@@ -33,10 +19,10 @@ jobs:
         mkdir -p ~/.kube
         echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-    # Deploy
+    # Deploy (use existing image)
     - name: Deploy to Kubernetes
       run: |
         kubectl set image deployment/frontend \
-        server=devroy/frontend:${{ github.sha }} -n default
+        server=devroy/frontend:471 -n default
 
         kubectl rollout status deployment/frontend -n default
