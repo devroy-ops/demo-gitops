@@ -121,7 +121,7 @@ pipeline {
                 POD=$(docker run --rm \
                 -v /root/.kube:/root/.kube \
                 bitnami/kubectl:latest \
-                kubectl get pod -n default -l app=frontend \
+                get pod -n default -l app=frontend \
                 -o jsonpath="{.items[0].metadata.name}")
                 
 
