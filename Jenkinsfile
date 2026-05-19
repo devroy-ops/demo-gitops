@@ -117,11 +117,22 @@ pipeline {
                 sh '''
                 echo "Fetching logs from frontend pod..."
 
-                POD=$(kubectl get pod -n default -l app=frontend -o jsonpath="{.items[0].metadata.name}")
+                
+                POD=$(docker run --rm \
+                -v /root/.kube:/root/.kube \
+                bitnami/kubectl:latest \
+                kubectl get pod -n default -l app=frontend \
+                -o jsonpath="{.items[0].metadata.name}")
+                
 
                 echo "Selected Pod: $POD"
 
+                
+                docker run --rm \
+                -v /root/.kube:/root/.kube \
+                bitnami/kubectl:latest \
                 kubectl logs -n default $POD > logs.txt
+
 
                 echo "Running AI log analyzer..."
 
