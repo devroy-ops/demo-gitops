@@ -1,4 +1,4 @@
-name: Frontend CI/CD
+name: Build & Push Image
 
 on:
   push:
@@ -6,23 +6,18 @@ on:
       - master
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    # Setup kubeconfig
-    - name: Set kubeconfig
-      run: |
-        mkdir -p ~/.kube
-        echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+    - name: Login to DockerHub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # Deploy (use existing image)
-    - name: Deploy to Kubernetes
+    - name: Build and Push Image
       run: |
-        kubectl set image deployment/frontend \
-        server=devroy/frontend:471 -n default
+        docker build -t devroy/frontend:${{ github.sha }} .
+        docker push devroy/frontend:${{ github.sha }}
 
-        kubectl rollout status deployment/frontend -n default

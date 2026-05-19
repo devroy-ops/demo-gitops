@@ -1,0 +1,49 @@
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2026-05-11T05:18:44Z"
+  labels:
+    app.kubernetes.io/managed-by: prometheus-operator
+    managed-by: prometheus-operator
+    operated-alertmanager: "true"
+  name: alertmanager-operated
+  namespace: monitoring
+  ownerReferences:
+  - apiVersion: monitoring.coreos.com/v1
+    kind: Alertmanager
+    name: monitoring-kube-prometheus-alertmanager
+    uid: 0aeee823-b03e-4afa-9de6-b096afdd59be
+  resourceVersion: "416193"
+  uid: ce21763a-f277-4900-bf87-b087325e1028
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: http-web
+    port: 9093
+    protocol: TCP
+    targetPort: http-web
+  - name: tcp-mesh
+    port: 9094
+    protocol: TCP
+    targetPort: mesh-tcp
+  - name: udp-mesh
+    port: 9094
+    protocol: UDP
+    targetPort: mesh-udp
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/name: alertmanager
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}

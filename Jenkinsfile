@@ -7,14 +7,18 @@ pipeline {
 
     stages {
 
-        // ✅ CHECKOUT
+        // =========================================
+        // ✅ CHECKOUT CODE
+        // =========================================
         stage('Checkout Code') {
             steps {
                 git branch: 'master', url: "${GIT_REPO}"
             }
         }
 
+        // =========================================
         // ✅ DOCKER LOGIN
+        // =========================================
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
@@ -23,7 +27,7 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
                     '''
                 }
             }
@@ -35,7 +39,7 @@ pipeline {
         stage('Build Frontend Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t devroy/frontend:${BUILD_NUMBER} .
+                docker build --no-cache -t devroy/frontend:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -43,7 +47,7 @@ pipeline {
         stage('Push Frontend Image') {
             steps {
                 sh '''
-                    docker push devroy/frontend:${BUILD_NUMBER}
+                docker push devroy/frontend:${BUILD_NUMBER}
                 '''
             }
         }
@@ -54,7 +58,7 @@ pipeline {
         stage('Build ProductCatalog Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t devroy/productcatalogservice:latest -f Dockerfile-productcatalog .
+                docker build --no-cache -t devroy/productcatalogservice:latest -f Dockerfile-productcatalog .
                 '''
             }
         }
@@ -62,7 +66,7 @@ pipeline {
         stage('Push ProductCatalog Image') {
             steps {
                 sh '''
-                    docker push devroy/productcatalogservice:latest
+                docker push devroy/productcatalogservice:latest
                 '''
             }
         }
@@ -73,7 +77,7 @@ pipeline {
         stage('Build CurrencyService Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t devroy/currencyservice:latest ./currencyservice
+                docker build --no-cache -t devroy/currencyservice:latest ./currencyservice
                 '''
             }
         }
@@ -81,7 +85,7 @@ pipeline {
         stage('Push CurrencyService Image') {
             steps {
                 sh '''
-                    docker push devroy/currencyservice:latest
+                docker push devroy/currencyservice:latest
                 '''
             }
         }
@@ -92,7 +96,7 @@ pipeline {
         stage('Build CartService Image') {
             steps {
                 sh '''
-                    docker build --no-cache -t devroy/cartservice:latest ./cartservice
+                docker build --no-cache -t devroy/cartservice:latest ./cartservice
                 '''
             }
         }
@@ -100,10 +104,45 @@ pipeline {
         stage('Push CartService Image') {
             steps {
                 sh '''
-                    docker push devroy/cartservice:latest
+                docker push devroy/cartservice:latest
                 '''
             }
         }
 
+        // =========================================
+        // ✅ AI LOG ANALYSIS (NEW STAGE)
+        // =========================================
+        stage('AI Log Analysis') {
+            steps {
+                sh '''
+                echo "Fetching logs from frontend pod..."
+
+                POD=$(kubectl get pod -n default -l app=frontend -o jsonpath="{.items[0].metadata.name}")
+
+                echo "Selected Pod: $POD"
+
+                kubectl logs -n default $POD > logs.txt
+
+                echo "Running AI log analyzer..."
+
+                python3 log_analyzer.py
+                '''
+            }
+        }
+    }
+
+    // =========================================
+    // ✅ POST ACTIONS
+    // =========================================
+    post {
+        success {
+            echo "✅ Pipeline completed successfully"
+        }
+        failure {
+            echo "🚨 AI detected issues → Pipeline stopped for safety"
+        }
+        always {
+            echo "Pipeline execution finished"
+        }
     }
 }
