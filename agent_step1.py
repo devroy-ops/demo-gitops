@@ -1,0 +1,92 @@
+from kubernetes import client, config
+import subprocess
+import time
+
+# ✅ Load Kubernetes config
+config.load_kube_config(config_file="/etc/kubernetes/admin.conf")
+
+# ✅ Create Kubernetes API client
+v1 = client.CoreV1Api()
+
+
+# ✅ Restart pod
+def restart_pod(name, namespace):
+    cmd = f"kubectl delete pod {name} -n {namespace}"
+    subprocess.call(cmd, shell=True)
+    print(f"[ACTION] Restarted {name}\n")
+
+
+# ✅ Get logs (IMPORTANT: use --previous)
+def get_logs(pod, namespace):
+    cmd = f"kubectl logs {pod} -n {namespace} --tail=20 --previous"
+    return subprocess.getoutput(cmd)
+
+
+# ✅ Decision engine (AI logic - rule based)
+def decide_action(logs):
+    logs = logs.lower()
+
+    if logs.strip() == "":
+        return "restart"
+
+    if "connection refused" in logs:
+        return "wait"
+
+    if "config" in logs or "invalid" in logs:
+        return "escalate"
+
+    if "error" in logs or "exception" in logs:
+        return "restart"
+
+    return "restart"
+
+
+# ✅ Main Agent Logic
+def run_agent():
+    print("\n✅ Connected to Kubernetes!")
+    print("\n🚨 Checking for issues...\n")
+
+    pods = v1.list_pod_for_all_namespaces()
+
+    for pod in pods.items:
+        restart_needed = False
+
+        for container in pod.status.container_statuses or []:
+
+            if  container.state.waiting and container.state.waiting.reason:
+                reason = container.state.waiting.reason
+
+                print(f"[ISSUE] {pod.metadata.name} → {reason}")
+                restart_needed = True
+
+        # ✅ If issue found
+        if restart_needed:
+            logs = get_logs(pod.metadata.name, pod.metadata.namespace)
+
+            print(f"[LOGS] {pod.metadata.name} logs:\n{logs}\n")
+
+            # ✅ DECIDE ACTION (VERY IMPORTANT)
+            action = decide_action(logs)
+
+            print(f"[DECISION] {action}\n")
+
+            # ✅ TAKE ACTION SMARTLY
+            if action == "restart":
+                restart_pod(pod.metadata.name, pod.metadata.namespace)
+
+            elif action == "wait":
+                print(f"[SKIP] Waiting before retrying {pod.metadata.name}\n")
+
+            elif action == "ignore":
+                print(f"[IGNORE] No logs for {pod.metadata.name}\n")
+
+            elif action == "escalate":
+                print(f"[ESCALATE] Manual intervention needed for {pod.metadata.name}\n")
+
+
+# ✅ Agent loop
+if __name__ == "__main__":
+    while True:
+        run_agent()
+        time.sleep(30)
+
