@@ -67,7 +67,7 @@ pipeline {
             steps {
                 sh '''
                 docker push devroy/productcatalogservice:latest
-                '''
+                '''  
             }
         }
 
