@@ -34,12 +34,12 @@ pipeline {
         }
 
         // =========================================
-        // ✅ FRONTEND
+        // ✅ BUILD FRONTEND IMAGE
         // =========================================
         stage('Build Frontend Image') {
             steps {
                 sh '''
-                docker build --no-cache -t devroy/frontend:${BUILD_NUMBER} .
+                docker build --network=host --no-cache -t devroy/frontend:${BUILD_NUMBER} .
                 '''
             }
         }
@@ -53,12 +53,12 @@ pipeline {
         }
 
         // =========================================
-        // ✅ PRODUCT CATALOG
+        // ✅ BUILD PRODUCT CATALOG
         // =========================================
         stage('Build ProductCatalog Image') {
             steps {
                 sh '''
-                docker build --no-cache -t devroy/productcatalogservice:latest -f Dockerfile-productcatalog .
+                docker build --network=host --no-cache -t devroy/productcatalogservice:latest -f Dockerfile-productcatalog .
                 '''
             }
         }
@@ -72,12 +72,12 @@ pipeline {
         }
 
         // =========================================
-        // ✅ CURRENCY SERVICE
+        // ✅ BUILD CURRENCY SERVICE
         // =========================================
         stage('Build CurrencyService Image') {
             steps {
                 sh '''
-                docker build --no-cache -t devroy/currencyservice:latest ./currencyservice
+                docker build --network=host --no-cache -t devroy/currencyservice:latest ./currencyservice
                 '''
             }
         }
@@ -91,12 +91,12 @@ pipeline {
         }
 
         // =========================================
-        // ✅ CART SERVICE
+        // ✅ BUILD CART SERVICE
         // =========================================
         stage('Build CartService Image') {
             steps {
                 sh '''
-                docker build --no-cache -t devroy/cartservice:latest ./cartservice
+                docker build --network=host --no-cache -t devroy/cartservice:latest ./cartservice
                 '''
             }
         }
@@ -110,32 +110,47 @@ pipeline {
         }
 
         // =========================================
-        // ✅ AI LOG ANALYSIS (NEW STAGE)
+        // ✅ UPDATE GIT FOR ARGOCD (VERY IMPORTANT)
+        // =========================================
+        stage('Update GitOps Repo') {
+            steps {
+                sh '''
+                echo "Updating Kubernetes manifest with new image"
+
+                sed -i "s|image: devroy/frontend:.*|image: devroy/frontend:${BUILD_NUMBER}|" deployment.yaml
+
+                git config user.email "jenkins@local"
+                git config user.name "jenkins"
+
+                git add deployment.yaml
+                git commit -m "Update frontend image to ${BUILD_NUMBER}"
+                git push origin master
+                '''
+            }
+        }
+
+        // =========================================
+        // ✅ AI LOG ANALYSIS
         // =========================================
         stage('AI Log Analysis') {
             steps {
                 sh '''
                 echo "Fetching logs from frontend pod..."
 
-                
                 POD=$(docker run --rm \
                 -v /root/.kube:/root/.kube \
                 bitnami/kubectl:latest \
                 get pod -n default -l app=frontend \
                 -o jsonpath="{.items[0].metadata.name}")
-                
 
                 echo "Selected Pod: $POD"
 
-                
                 docker run --rm \
                 -v /root/.kube:/root/.kube \
                 bitnami/kubectl:latest \
-                kubectl logs -n default $POD > logs.txt
-
+                logs -n default $POD > logs.txt
 
                 echo "Running AI log analyzer..."
-
                 python3 log_analyzer.py
                 '''
             }
@@ -150,10 +165,11 @@ pipeline {
             echo "✅ Pipeline completed successfully"
         }
         failure {
-            echo "🚨 AI detected issues → Pipeline stopped for safety"
+            echo "🚨 Pipeline failed — check logs"
         }
         always {
             echo "Pipeline execution finished"
         }
     }
 }
+
