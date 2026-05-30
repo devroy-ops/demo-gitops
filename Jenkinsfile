@@ -102,8 +102,10 @@ pipeline {
 
                     git add deployment.yaml
                     git commit -m "Update frontend image to ${BUILD_NUMBER}"
+                    echo "Setting authenticated remote..."
 
                     git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/devroy-ops/demo-gitops.git
+                    git remote -v   # ✅ IMPORTANT DEBUG
                     git push origin master
                     '''
                 }
