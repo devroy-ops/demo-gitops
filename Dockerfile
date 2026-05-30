@@ -1,8 +1,7 @@
 FROM golang:1.22-alpine3.18
 
-# ✅ Only change mirror (no DNS override)
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.edge.kernel.org/' /etc/apk/repositories \
-    && apk update \
+# ✅ Use default repo + retry mechanism
+RUN apk update || apk update || apk update \
     && apk add --no-cache git
 
 WORKDIR /app
