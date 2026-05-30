@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         GIT_REPO = "https://github.com/devroy-ops/demo-gitops.git"
+        DOCKER_REPO = "devroy"
     }
 
     stages {
@@ -22,110 +23,90 @@ pipeline {
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
+                    credentialsId: 'docker-creds',   // ✅ FIXED
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                     '''
                 }
             }
         }
 
         // =========================================
-        // ✅ BUILD FRONTEND IMAGE
+        // ✅ BUILD + PUSH FRONTEND
         // =========================================
-        stage('Build Frontend Image') {
+        stage('Build & Push Frontend') {
             steps {
                 sh '''
-                docker build --network=host --no-cache -t devroy/frontend:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push Frontend Image') {
-            steps {
-                sh '''
-                docker push devroy/frontend:${BUILD_NUMBER}
+                docker build -t ${DOCKER_REPO}/frontend:${BUILD_NUMBER} .
+                docker push ${DOCKER_REPO}/frontend:${BUILD_NUMBER}
                 '''
             }
         }
 
         // =========================================
-        // ✅ BUILD PRODUCT CATALOG
+        // ✅ BUILD + PUSH PRODUCT CATALOG
         // =========================================
-        stage('Build ProductCatalog Image') {
+        stage('Build & Push ProductCatalog') {
             steps {
                 sh '''
-                DOCKER_BUILDKIT=0 docker build --network=host -t devroy/demo-app:${BUILD_NUMBER} .
-                '''
-            }
-        }
-
-        stage('Push ProductCatalog Image') {
-            steps {
-                sh '''
-                docker push devroy/productcatalogservice:latest
-                '''     
-            }
-        }
-
-        // =========================================
-        // ✅ BUILD CURRENCY SERVICE
-        // =========================================
-        stage('Build CurrencyService Image') {
-            steps {
-                sh '''
-                docker build --network=host --no-cache -t devroy/currencyservice:latest ./currencyservice
-                '''
-            }
-        }
-
-        stage('Push CurrencyService Image') {
-            steps {
-                sh '''
-                docker push devroy/currencyservice:latest
+                docker build -t ${DOCKER_REPO}/productcatalogservice:${BUILD_NUMBER} ./productcatalogservice
+                docker push ${DOCKER_REPO}/productcatalogservice:${BUILD_NUMBER}
                 '''
             }
         }
 
         // =========================================
-        // ✅ BUILD CART SERVICE
+        // ✅ BUILD + PUSH CURRENCY SERVICE
         // =========================================
-        stage('Build CartService Image') {
+        stage('Build & Push CurrencyService') {
             steps {
                 sh '''
-                docker build --network=host --no-cache -t devroy/cartservice:latest ./cartservice
-                '''
-            }
-        }
-
-        stage('Push CartService Image') {
-            steps {
-                sh '''
-                docker push devroy/cartservice:latest
+                docker build -t ${DOCKER_REPO}/currencyservice:${BUILD_NUMBER} ./currencyservice
+                docker push ${DOCKER_REPO}/currencyservice:${BUILD_NUMBER}
                 '''
             }
         }
 
         // =========================================
-        // ✅ UPDATE GIT FOR ARGOCD (VERY IMPORTANT)
+        // ✅ BUILD + PUSH CART SERVICE
+        // =========================================
+        stage('Build & Push CartService') {
+            steps {
+                sh '''
+                docker build -t ${DOCKER_REPO}/cartservice:${BUILD_NUMBER} ./cartservice
+                docker push ${DOCKER_REPO}/cartservice:${BUILD_NUMBER}
+                '''
+            }
+        }
+
+        // =========================================
+        // ✅ UPDATE GITOPS (FIXED ✅)
         // =========================================
         stage('Update GitOps Repo') {
             steps {
-                sh '''
-                echo "Updating Kubernetes manifest with new image"
+                withCredentials([usernamePassword(
+                    credentialsId: 'git-creds',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_PASS'
+                )]) {
+                    sh '''
+                    echo "Updating Kubernetes manifest..."
 
-                sed -i "s|image: devroy/frontend:.*|image: devroy/frontend:${BUILD_NUMBER}|" deployment.yaml
+                    sed -i "s|image: devroy/frontend:.*|image: devroy/frontend:${BUILD_NUMBER}|" deployment.yaml
 
-                git config user.email "jenkins@local"
-                git config user.name "jenkins"
+                    git config --global user.email "ci@jenkins.com"
+                    git config --global user.name "jenkins"
 
-                git add deployment.yaml
-                git commit -m "Update frontend image to ${BUILD_NUMBER}"
-                git push origin master
-                '''
+                    git add deployment.yaml
+                    git commit -m "Update frontend image to ${BUILD_NUMBER}"
+
+                    git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/devroy-ops/demo-gitops.git
+                    git push origin master
+                    '''
+                }
             }
         }
 
@@ -158,18 +139,18 @@ pipeline {
     }
 
     // =========================================
-    // ✅ POST ACTIONS
+    // ✅ POST
     // =========================================
     post {
         success {
-            echo "✅ Pipeline completed successfully"
+            echo "✅ Pipeline SUCCESS"
         }
         failure {
-            echo "🚨 Pipeline failed — check logs"
+            echo "🚨 Pipeline FAILED"
         }
         always {
-            echo "Pipeline execution finished"
+            echo "Pipeline finished"
         }
     }
 }
- 
+
