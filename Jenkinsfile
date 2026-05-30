@@ -58,7 +58,7 @@ pipeline {
         stage('Build ProductCatalog Image') {
             steps {
                 sh '''
-                docker build --network=host --no-cache -t devroy/productcatalogservice:latest -f Dockerfile-productcatalog .
+                DOCKER_BUILDKIT=0 docker build --network=host -t devroy/demo-app:${BUILD_NUMBER} .
                 '''
             }
         }
