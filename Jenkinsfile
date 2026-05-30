@@ -1,6 +1,6 @@
 pipeline {
     agent any
-
+  
     environment {
         GIT_REPO = "https://github.com/devroy-ops/demo-gitops.git"
         DOCKER_REPO = "devroy"
