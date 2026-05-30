@@ -1,8 +1,7 @@
-FROM golang:alpine
+FROM golang:1.22-alpine3.18
 
-# ✅ FIX: force working DNS + mirror + retry-safe install
-RUN echo "nameserver 8.8.8.8" > /etc/resolv.conf \
-    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.edge.kernel.org/' /etc/apk/repositories \
+# ✅ Only change mirror (no DNS override)
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.edge.kernel.org/' /etc/apk/repositories \
     && apk update \
     && apk add --no-cache git
 
