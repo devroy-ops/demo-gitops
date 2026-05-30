@@ -4,26 +4,30 @@ pipeline {
     environment {
         GIT_REPO = "https://github.com/devroy-ops/demo-gitops.git"
         DOCKER_REPO = "devroy"
+        IMAGE_NAME = "demo-app"
     }
 
     stages {
 
-        // =========================================
-        // ✅ CHECKOUT CODE
-        // =========================================
+        // ✅ CLEAN OLD WORKSPACE (VERY IMPORTANT)
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
+        // ✅ CLONE CODE
         stage('Checkout Code') {
             steps {
                 git branch: 'master', url: "${GIT_REPO}"
             }
         }
 
-        // =========================================
         // ✅ DOCKER LOGIN
-        // =========================================
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
-                    credentialsId: 'docker-creds',   // ✅ FIXED
+                    credentialsId: 'docker-creds',
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
@@ -34,87 +38,58 @@ pipeline {
             }
         }
 
-        // =========================================
-        // ✅ BUILD + PUSH FRONTEND
-        // =========================================
-        stage('Build & Push Frontend') {
+        // ✅ BUILD DOCKER IMAGE
+        stage('Build Docker Image') {
             steps {
                 sh '''
-                docker build -t ${DOCKER_REPO}/frontend:${BUILD_NUMBER} .
-                docker push ${DOCKER_REPO}/frontend:${BUILD_NUMBER}
+                docker build -t ${DOCKER_REPO}/${IMAGE_NAME}:${BUILD_NUMBER} .
                 '''
             }
         }
 
-        // =========================================
-        // ✅ BUILD + PUSH PRODUCT CATALOG
-        // =========================================
-        stage('Build & Push ProductCatalog') {
+        // ✅ PUSH DOCKER IMAGE
+        stage('Push Docker Image') {
             steps {
                 sh '''
-                docker build -t ${DOCKER_REPO}/productcatalogservice:${BUILD_NUMBER} ./productcatalogservice
-                docker push ${DOCKER_REPO}/productcatalogservice:${BUILD_NUMBER}
+                docker push ${DOCKER_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}
                 '''
             }
         }
 
-        // =========================================
-        // ✅ BUILD + PUSH CURRENCY SERVICE
-        // =========================================
-        stage('Build & Push CurrencyService') {
-            steps {
-                sh '''
-                docker build -t ${DOCKER_REPO}/currencyservice:${BUILD_NUMBER} ./currencyservice
-                docker push ${DOCKER_REPO}/currencyservice:${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        // =========================================
-        // ✅ BUILD + PUSH CART SERVICE
-        // =========================================
-        stage('Build & Push CartService') {
-            steps {
-                sh '''
-                docker build -t ${DOCKER_REPO}/cartservice:${BUILD_NUMBER} ./cartservice
-                docker push ${DOCKER_REPO}/cartservice:${BUILD_NUMBER}
-                '''
-            }
-        }
-
-        // =========================================
-        // ✅ UPDATE GITOPS (FIXED ✅)
-        // =========================================
+        // ✅ UPDATE GITOPS REPO (FIXED ✅)
         stage('Update GitOps Repo') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'git-creds',
                     usernameVariable: 'GIT_USER',
                     passwordVariable: 'GIT_PASS'
-                )]) {   
+                )]) {
                     sh '''
                     echo "Updating Kubernetes manifest..."
 
-                    sed -i "s|image: devroy/frontend:.*|image: devroy/frontend:${BUILD_NUMBER}|" deployment.yaml
+                    sed -i "s|image:.*|image: ${DOCKER_REPO}/${IMAGE_NAME}:${BUILD_NUMBER}|" deployment.yaml
 
                     git config --global user.email "ci@jenkins.com"
                     git config --global user.name "jenkins"
 
                     git add deployment.yaml
-                    git commit -m "Update frontend image to ${BUILD_NUMBER}"
+
+                    # ✅ SAFE COMMIT
+                    git commit -m "Update image to ${BUILD_NUMBER}" || echo "No changes to commit"
+
                     echo "Setting authenticated remote..."
 
                     git remote set-url origin https://${GIT_USER}:${GIT_PASS}@github.com/devroy-ops/demo-gitops.git
-                    git remote -v   # ✅ IMPORTANT DEBUG
+
+                    git remote -v
+
                     git push origin master
                     '''
                 }
             }
         }
 
-        // =========================================
         // ✅ AI LOG ANALYSIS
-        // =========================================
         stage('AI Log Analysis') {
             steps {
                 sh '''
@@ -140,9 +115,6 @@ pipeline {
         }
     }
 
-    // =========================================
-    // ✅ POST
-    // =========================================
     post {
         success {
             echo "✅ Pipeline SUCCESS"
