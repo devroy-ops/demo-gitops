@@ -91,7 +91,7 @@ pipeline {
                     credentialsId: 'git-creds',
                     usernameVariable: 'GIT_USER',
                     passwordVariable: 'GIT_PASS'
-                )]) {
+                )]) {   
                     sh '''
                     echo "Updating Kubernetes manifest..."
 
