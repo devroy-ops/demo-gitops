@@ -75,7 +75,7 @@ pipeline {
                     git add deployment.yaml
 
                     # ✅ SAFE COMMIT
-                    git commit -m "Update image to ${BUILD_NUMBER}" || echo "No changes to commit"
+                    git commit -m "[skip ci] Update image to ${BUILD_NUMBER}" || echo "No changes"
 
                     echo "Setting authenticated remote..."
 
