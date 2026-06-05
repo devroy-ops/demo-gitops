@@ -19,7 +19,7 @@ spec:
         app: frontend
     spec:
       containers:
-        - name: frontend
+        - name: fdevroy/frontend:latest
           image: gcr.io/google-samples/microservices-demo/frontend:v0.10.2
           ports:
             - containerPort: 8080
