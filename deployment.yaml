@@ -14,9 +14,11 @@ spec:
     spec:
       containers:
       - name: demo-app
+
         image: devroy/demo-app:11
+        image: devroy/frontend
         ports:
-        - containerPort: 80
+        - containerPort: 8080
 ---
 apiVersion: v1
 kind: Service
@@ -28,5 +30,5 @@ spec:
     app: demo-app
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 8080
     nodePort: 30091
