@@ -15,8 +15,8 @@ spec:
       containers:
       - name: demo-app
 
-        image: devroy/demo-app:11
-        image: devroy/frontend
+        image: devroy/demo-app:14
+        image: devroy/demo-app:14
         ports:
         - containerPort: 8080
 ---
