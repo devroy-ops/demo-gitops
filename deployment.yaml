@@ -1,6 +1,6 @@
 containers:
 - name: frontend
-  image: devroy/frontend:latest
+  image: devroy/demo-app:17
   ports:
   - containerPort: 8080
 
