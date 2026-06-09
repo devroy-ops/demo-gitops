@@ -50,7 +50,6 @@ spec:
         - name: AD_SERVICE_ADDR
           value: "adservice:9555"
 
-        - name: SHOPPING_ASSISTANT_SERVICE_ADDR
           value: "shoppingassistantservice:8080"
 
 ---
