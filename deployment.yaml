@@ -50,7 +50,8 @@ spec:
         - name: AD_SERVICE_ADDR
           value: "adservice:9555"
 
-          value: "shoppingassistantservice:8080"
+        - name: SHOPPING_ASSISTANT_SERVICE_ADDR
+          value: "localhost:8080"
 
 ---
 apiVersion: v1
